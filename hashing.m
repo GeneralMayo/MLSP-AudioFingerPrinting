@@ -29,7 +29,7 @@ function [Address ] = hashing( peaks, target_zone_size, anchor_position)
     % the following vector are the element of the target zone.
     anchor_target_zone = [anchors, target_zone] ;
 
-    % let calculate the address for each target zone
+    % let's calculate the address for each target zone
     % each point will have multiple addresses and this is relative to 
     % what target zone it belong to . as we know a point could be member of up
     % to 5 target zone  . this mean that a point might have up to 5 addresse.

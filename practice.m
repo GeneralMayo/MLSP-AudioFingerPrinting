@@ -13,7 +13,7 @@ nfft = 1028;
 [S,~,~] = spectrogram(m, window, noverlap, nfft, fs);
 
 %% Get the peaks
-peaks = get_peaks(S) ;
+peaks = get_peaks(S);
 
 %figure, scatter(peaks(:,1), peaks(:,2))
 
@@ -25,4 +25,17 @@ target_zone_size = 5;
 anchor_position = 3 ;
 Address = hashing(peaks,target_zone_size,anchor_position);
 
-%%
+%% Matching
+
+%get seconds 2-4 from piano recording
+mRecording = m(fs*2+1:fs*4,:);
+[Srecording,~,~] = spectrogram(mRecording, window, noverlap, nfft, fs);
+peaksRecording = get_peaks(Srecording);
+AddressRecording = hashing(peaksRecording,target_zone_size,anchor_position);
+max_delta = find_delta(Address,AddressRecording);
+
+%music samples per spectrogram sample
+sampleRatio = size(m,1)/size(S,2);
+fspectrogram = fs/sampleRatio;
+%This should be approximately 2sec... and it is!
+display(max_delta/fspectrogram)

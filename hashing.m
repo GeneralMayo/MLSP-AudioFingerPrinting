@@ -13,7 +13,7 @@ function [Address ] = hashing( peaks, target_zone_size, anchor_position)
     indexing = [ind', peaks] ;
     % generating target zone, 
     target_zone = [] ; 
-    zone = zeros(1, target_zone_size) ;
+    zone = zeros(1, target_zone_size);
     for i = 1: (size(indexing, 1)- target_zone_size +1) 
         zone = ind(i:i+target_zone_size-1);
         target_zone = [target_zone ; zone] ;

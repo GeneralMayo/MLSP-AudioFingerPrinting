@@ -66,19 +66,25 @@ function [maxDelta, confidence] = find_delta(Addr,AddrR,targetZoneSize)
         end
     end
     
-    %find max delta
+    %find max delta and sum of all delta frequencies
     maxDelta = -inf;
     maxDeltaFreq = -inf;
     deltas = cell2mat(keys(deltaHM));
+    freqTotal = 0;
     for i = 1:size(deltas,2)
         deltaFreq = deltaHM(deltas(i)); 
+        freqTotal = freqTotal+deltaFreq;
         if(deltaFreq>maxDeltaFreq)
             maxDelta = deltas(i);
             maxDeltaFreq = deltaFreq;
         end
     end
     
+    keyboard;
+    confidence = double(maxDeltaFreq)/double(freqTotal);
+    
     %find overlap times
+    %{
     anchorTimesHM = delta2AbsTime2Count.get(double(maxDelta));
     overlapStart = inf;
     overlapStop = -inf;
@@ -99,12 +105,13 @@ function [maxDelta, confidence] = find_delta(Addr,AddrR,targetZoneSize)
             end
         end
     end
+    %}
     
+    %targetZoneTimes = cell2mat(keys(targetZoneTimes));
+    %targetZonesInOverlapPeriod = length(find(targetZoneTimes>=overlapStart & targetZoneTimes<=overlapStop));
     
-    targetZoneTimes = cell2mat(keys(targetZoneTimes));
-    targetZonesInOverlapPeriod = length(find(targetZoneTimes>=overlapStart & targetZoneTimes<=overlapStop));
-    
-    confidence = totalMatchedTargetZones/targetZonesInOverlapPeriod;
+    %keyboard;
+    %confidence = totalMatchedTargetZones/targetZonesInOverlapPeriod;
 end
 
 

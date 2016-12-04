@@ -23,7 +23,7 @@ peaks = get_peaks(S);
 % the  point and the last represent the absolute time of the anchor.
 target_zone_size = 5;
 anchor_position = 3 ;
-Address = hashing(peaks,target_zone_size,anchor_position);
+Address = hashing(peaks,target_zone_size,anchor_position,4);
 
 %% Matching
 
@@ -31,11 +31,33 @@ Address = hashing(peaks,target_zone_size,anchor_position);
 mRecording = m(fs*2+1:fs*4,:);
 [Srecording,~,~] = spectrogram(mRecording, window, noverlap, nfft, fs);
 peaksRecording = get_peaks(Srecording);
-AddressRecording = hashing(peaksRecording,target_zone_size,anchor_position);
+AddressRecording = hashing(peaksRecording,target_zone_size,anchor_position,2);
+
+sameDelta =0;
+diffDelta = 0;
+for i = 1:size(AddressRecording,1)
+    for j = 1:size(Address,1)
+        if(AddressRecording(i,1)==Address(j,1))
+            if(AddressRecording(i,1) - Address(j,1) == 0)
+                sameDelta = sameDelta+1;
+            else
+                diffDelta = diffDelta+1;
+            end
+        end
+    end
+end
+
+sameDelta
+diffDelta
+
+
+%{
 max_delta = find_delta(Address,AddressRecording,target_zone_size);
+
 
 %music samples per spectrogram sample
 sampleRatio = size(m,1)/size(S,2);
 fspectrogram = fs/sampleRatio;
 %This should be approximately 2sec... and it is!
 display(max_delta/fspectrogram)
+%}

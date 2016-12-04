@@ -1,4 +1,18 @@
+%initialize global variables
+global TARGET_ZONE_SIZE ANCHOR_POSITION WINDOW NOVERLAP NFFT NUM_SPLITS;
+TARGET_ZONE_SIZE = 5;
+ANCHOR_POSITION = 3;
+WINDOW = 1028;
+NOVERLAP = 128;
+NFFT = 1028;
+NUM_SPLITS = 3;
+
+%seed the rng
+SEED = 42;
+rng(SEED);
+
 %load sound data
+clear;
 soundFiles = dir('data/*.mp3');
 [soundFileNames,soundFileData] = parseFiles(soundFiles);
 

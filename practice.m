@@ -38,7 +38,9 @@ diffDelta = 0;
 for i = 1:size(AddressRecording,1)
     for j = 1:size(Address,1)
         if(AddressRecording(i,1)==Address(j,1))
-            if(AddressRecording(i,1) - Address(j,1) == 0)
+            keyboard;
+            if(AddressRecording(i,2) - Address(j,2) == 0)
+               
                 sameDelta = sameDelta+1;
             else
                 diffDelta = diffDelta+1;

@@ -38,9 +38,9 @@ diffDelta = 0;
 for i = 1:size(AddressRecording,1)
     for j = 1:size(Address,1)
         if(AddressRecording(i,1)==Address(j,1))
-            keyboard;
-            if(AddressRecording(i,2) - Address(j,2) == 0)
-               
+            %disp(AddressRecording(i,:))
+            %disp(Address(j,:))
+            if(AddressRecording(i,2) - Address(j,2) == 0)   
                 sameDelta = sameDelta+1;
             else
                 diffDelta = diffDelta+1;
@@ -49,11 +49,7 @@ for i = 1:size(AddressRecording,1)
     end
 end
 
-sameDelta
-diffDelta
 
-
-%{
 max_delta = find_delta(Address,AddressRecording,target_zone_size);
 
 
@@ -62,4 +58,3 @@ sampleRatio = size(m,1)/size(S,2);
 fspectrogram = fs/sampleRatio;
 %This should be approximately 2sec... and it is!
 display(max_delta/fspectrogram)
-%}

@@ -77,13 +77,11 @@ function [maxDelta, confidence] = find_delta(Addr,AddrR,targetZoneSize)
             maxDeltaFreq = deltaFreq;
         end
     end
-    keyboard;
     
     %find overlap times
     anchorTimesHM = delta2AbsTime2Count.get(double(maxDelta));
     overlapStart = inf;
     overlapStop = -inf;
-    keyboard;
     anchorTimes = cell2mat(anchorTimesHM.keySet.toArray.cell);
     totalMatchedTargetZones = 0;
     for atIdx = 1:length(anchorTimes)
@@ -107,7 +105,6 @@ function [maxDelta, confidence] = find_delta(Addr,AddrR,targetZoneSize)
     targetZonesInOverlapPeriod = length(find(targetZoneTimes>=overlapStart & targetZoneTimes<=overlapStop));
     
     confidence = totalMatchedTargetZones/targetZonesInOverlapPeriod;
-    keyboard;
 end
 
 

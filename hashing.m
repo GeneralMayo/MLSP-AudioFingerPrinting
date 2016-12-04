@@ -50,11 +50,14 @@ function [Address ] = hashing( peaks, target_zone_size, anchor_position, id)
         zone_addr = addressing(zone,indexing, id) ;
         % Convert each address into a 32 bit int
         % [9bits = f_a 9bits = f_p 14bits = Dt]
-        hash_value = int32(0);
-        hash_value = zone_addr(3);
-        hash_value = hash_value + bitshift(zone_addr(2), 14);
-        hash_value = hash_value + bitshift(zone_addr(1), 14 + 9);
-        new_addr = [hash_value, zone_addr(4:5)];
+        new_addr = [];
+        for x=1:size(zone_addr,1)
+            hash_value = int32(0);
+            hash_value = zone_addr(x,3);
+            hash_value = hash_value + bitshift(zone_addr(x,2), 14);
+            hash_value = hash_value + bitshift(zone_addr(x,1), 14 + 9);
+            new_addr = [new_addr; hash_value, zone_addr(x,4:5)];
+        end
         Address = [Address ; new_addr] ;
     end
 end

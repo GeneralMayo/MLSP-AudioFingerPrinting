@@ -32,7 +32,7 @@ mRecording = m(fs*2+1:fs*4,:);
 [Srecording,~,~] = spectrogram(mRecording, window, noverlap, nfft, fs);
 peaksRecording = get_peaks(Srecording);
 AddressRecording = hashing(peaksRecording,target_zone_size,anchor_position);
-max_delta = find_delta(Address,AddressRecording);
+max_delta = find_delta(Address,AddressRecording,target_zone_size);
 
 %music samples per spectrogram sample
 sampleRatio = size(m,1)/size(S,2);

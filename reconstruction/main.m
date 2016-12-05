@@ -17,13 +17,13 @@ soundFiles = dir('data/*.mp3');
 [soundFileNames,soundFileData] = parseFiles(soundFiles);
 
 %generate sample data
-recordings = generateData(soundFileData);
+[recordings, recording_components] = generateData(soundFileData);
 
 %reconstruct a set of timelines from sample recordings
-timelines = constructTimelines(recordings);
+[timelines, timeline_components] = constructTimelines(recordings);
 
 %compute errors and output
-error = computeError(soundFileData,timelines);
+error = computeError(recording_components,timeline_components);
 
 %output results
 figure

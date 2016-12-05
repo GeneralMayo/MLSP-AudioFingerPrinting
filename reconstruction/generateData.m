@@ -17,7 +17,7 @@ function [sample_data, data_components] = generateData(sound_file_data)
 
     sample_data = cell(1, NUM_SPLITS*size(sound_file_data,2));
     data_components = cell(1,size(sound_file_data,2));
-
+    
     for k=1:size(sound_file_data,2)
         sample = sound_file_data(k);
         m = sample{1}{1};
@@ -26,13 +26,14 @@ function [sample_data, data_components] = generateData(sound_file_data)
         last_len = 0;
         last_end = 0;
         for i=1:NUM_SPLITS
-            if i=0
+            sample_idx = (k-1)*NUM_SPLITS + i;
+            if i==0
                 % Initialize the list in the components cell array
-                data_components(k) = [];
+                data_components{k} = [];
             end
 
             % Add the components to the component list
-            data_components(k) = [data_components(k); (k-1)*NUM_SPLITS + i];
+            data_components{k} = [data_components{k}; sample_idx];
 
             % TODO: improve how segments are chosen
             % Select a starting point that overlaps with the last chosen segment
@@ -45,9 +46,9 @@ function [sample_data, data_components] = generateData(sound_file_data)
             end
 
             % TODO: Add noise to the segment
-            sample_data{i} = cell(2,1);
-            sample_data{i}{1} = m(start_pos:end_pos);
-            sample_data{i}{2} = fs;
+            sample_data{sample_idx} = cell(2,1);
+            sample_data{sample_idx}{1} = m(start_pos:end_pos);
+            sample_data{sample_idx}{2} = fs;
        end
     end
 end

@@ -24,6 +24,7 @@ for i=1:size(recordings,2)
        matches(i,j) = matchCell;
    end
 end
+keyboard;
 
 %construct timelines by merging recordings based on match matrix
 timelines = merge(matches,recordings);

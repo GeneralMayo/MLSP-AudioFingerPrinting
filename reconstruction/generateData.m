@@ -4,9 +4,11 @@ function [sampleData] = generateData(soundFileData)
 %output: 1xM cell of audio recordings, where M = number of recordings
     NUM_SPLITS = 3;
     sampleData = cell(1, NUM_SPLITS*size(soundFileData,2));
-    for sample=soundFileData
-        m = sample{1}{1};
-        fs = sample{1}{2};
+    
+    for soundFileIdx=1:size(soundFileData,1)
+        sample = soundFileData{soundFileIdx};
+        m = sample{1};
+        fs = sample{2};
         sound_len = size(m,1);
         last_len = 0;
         last_end = 0;

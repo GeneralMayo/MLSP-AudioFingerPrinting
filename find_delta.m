@@ -1,9 +1,8 @@
-function [maxDelta, confidence] = find_delta(Addr,AddrR,targetZoneSize)
+function [maxDelta, confidence] = find_delta(Addr,AddrR)
     %hashmap for address "database"
     AddrHM = containers.Map('KeyType','int32','ValueType','char');
     %make AddrHM
     for i = 1:size(Addr,1)
-        %key = [num2str(Addr(i,1)),num2str(Addr(i,2)),num2str(Addr(i,3))];
         key = Addr(i,1);
         if(isKey(AddrHM,key))
             AddrHM(key) = [AddrHM(key),'_',num2str(Addr(i,2))];

@@ -13,8 +13,8 @@ rng(SEED);
 
 %load sound data
 clear;
-soundFiles = dir('data/*.mp3');
-[soundFileNames,soundFileData] = parseFiles(soundFiles);
+soundFilesDir = 'data/';
+[soundFileNames,soundFileData] = parseFiles(soundFilesDir);
 
 %generate sample data
 recordings = generateData(soundFileData);

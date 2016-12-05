@@ -34,5 +34,6 @@ function [ error ] = computeError(recording_components,timeline_components)
             end
         end
     end
+    error = [error; sum(components_found)/size(components_found,1)];
 end
 

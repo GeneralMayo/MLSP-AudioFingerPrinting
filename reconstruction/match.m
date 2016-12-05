@@ -5,7 +5,9 @@ function [coefficient,offset] = match(Addr,AddrR)
 %        offset - offset added to B to line up with matched portion of A
 %           i.e A(t) ~ B(t + offset)
 
-
+    
+    Addr = Addr{1};
+    AddrR = AddrR{1};
     %hashmap for address "database"
     AddrHM = containers.Map('KeyType','int32','ValueType','char');
     %make AddrHM

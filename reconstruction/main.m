@@ -13,15 +13,20 @@ SEED = 42;
 rng(SEED);
 
 %load sound data
+disp('Loading sound data...')
 [soundFileNames,soundFileData] = parseFiles();
 
 %generate sample data
+disp('Generating sample data...')
 [recordings, recording_components] = generateData(soundFileData);
 
 %reconstruct a set of timelines from sample recordings
-%[timelines, timeline_components] = constructTimelines(recordings);
-constructTimelines(recordings);
+
+disp('Reconstructing timelines...')
+[timelines, timeline_components] = constructTimelines(recordings);
+
 %compute errors and output
+disp('Computing error...')
 error = computeError(recording_components,timeline_components);
 
 %output results

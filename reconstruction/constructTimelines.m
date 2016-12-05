@@ -6,6 +6,7 @@ function [ timelines ] = constructTimelines( recordings )
 %upper right triangular cell matrix where entry 
 %   (i,j) = {coefficient,offset} for match between (i,j)
 %upper right triangular since we do not need to redo matches
+
 matches = cell(size(recordings,2));
 addresses = cell(1,size(recordings,2));
 

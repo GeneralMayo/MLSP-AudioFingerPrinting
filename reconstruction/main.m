@@ -1,29 +1,28 @@
 %initialize global variables
-global TARGET_ZONE_SIZE ANCHOR_POSITION WINDOW NOVERLAP NFFT NUM_SPLITS;
+global TARGET_ZONE_SIZE ANCHOR_POSITION WINDOW NOVERLAP NFFT NUM_SPLITS DATA_DIR;
 TARGET_ZONE_SIZE = 5;
 ANCHOR_POSITION = 3;
 WINDOW = 1028;
 NOVERLAP = 128;
 NFFT = 1028;
 NUM_SPLITS = 3;
+DATA_DIR = 'data/';
 
 %seed the rng
 SEED = 42;
 rng(SEED);
 
 %load sound data
-clear;
-soundFilesDir = 'data/';
-[soundFileNames,soundFileData] = parseFiles(soundFilesDir);
+[soundFileNames,soundFileData] = parseFiles();
 
 %generate sample data
-recordings = generateData(soundFileData);
+[recordings, recording_components] = generateData(soundFileData);
 
 %reconstruct a set of timelines from sample recordings
-timelines = constructTimelines(recordings);
-
+%[timelines, timeline_components] = constructTimelines(recordings);
+constructTimelines(recordings);
 %compute errors and output
-error = computeError(soundFileData,timelines);
+error = computeError(recording_components,timeline_components);
 
 %output results
 figure

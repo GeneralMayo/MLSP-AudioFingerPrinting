@@ -10,6 +10,7 @@ m = audio{1};
 fs = audio{2};
 [S,~,~] = spectrogram(m, WINDOW, NOVERLAP, NFFT, fs);
 
+keyboard;
 %get high energy peaks
 peaks = get_peaks(S);
 

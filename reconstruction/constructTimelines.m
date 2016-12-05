@@ -22,9 +22,10 @@ for i=1:size(recordings,2)
        [coefficient,offset] = match(addresses(i),addresses(j));
        matchCell{1} = coefficient;
        matchCell{2} = offset;
-       matches(i,j) = matchCell;
+       matches{i,j} = matchCell;
    end
 end
+toc;
 keyboard;
 
 %construct timelines by merging recordings based on match matrix

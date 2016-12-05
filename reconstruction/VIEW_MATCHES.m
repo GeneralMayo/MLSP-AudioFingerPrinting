@@ -6,3 +6,5 @@ for i = 1:5
         matchesMat(i,j)  = confidence;
     end
 end
+
+disp(matchesMat)

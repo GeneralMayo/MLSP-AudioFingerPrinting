@@ -47,7 +47,7 @@ function [sample_data, data_components] = generateData(sound_file_data)
 
             % TODO: Add noise to the segment
             sample_data{sample_idx} = cell(2,1);
-            sample_data{sample_idx}{1} = m(start_pos:end_pos);
+            sample_data{sample_idx}{1} = m(start_pos:end_pos)+rand(size(m(start_pos:end_pos)))/10;
             sample_data{sample_idx}{2} = fs;
        end
     end

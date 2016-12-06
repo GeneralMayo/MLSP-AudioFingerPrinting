@@ -11,12 +11,11 @@ function [coefficient,offset] = match(A,B)
     B = B{1};
     
     %hashmap for address "database"
-    %AHM = containers.Map('KeyType','int32','ValueType','char');
     AHM = java.util.HashMap;
-    
     %make AHM
     for i = 1:size(A,1)
         key = A(i,1);
+        
         if(AHM.containsKey(key))
             AHM.put(key,[AHM.get(key);A(i,2)]);
         else
@@ -25,7 +24,7 @@ function [coefficient,offset] = match(A,B)
     end
     
     %hashmap of "delta frequencies"
-    deltaHM = containers.Map('KeyType','int32','ValueType','int32');
+    deltaHM = java.util.HashMap;
     
     totalMatches = 0;
     %look for matching addresses
@@ -40,7 +39,7 @@ function [coefficient,offset] = match(A,B)
             
             %get all anchor values corresponding to key in timeline
             absolute_times = AHM.get(key);
-            
+                     
             %iterate through these anchor values
             for j = 1:size(absolute_times,1)
                 %compute delta
@@ -48,25 +47,26 @@ function [coefficient,offset] = match(A,B)
                 
                 %increment values of hashmaps if they exist add them if
                 %they don't
-                if(isKey(deltaHM,delta)) 
-                    deltaHM(delta) = deltaHM(delta)+1; 
+                if(deltaHM.containsKey(delta))
+                    deltaHM.put(delta,deltaHM.get(delta)+1);
                 else
-                    deltaHM(delta) = 1;
+                    deltaHM.put(delta,1);
                 end
             end
+            
         end
     end
     
     %find max delta and sum of all delta frequencies
     maxDelta = -inf;
     maxDeltaFreq = -inf;
-    deltas = cell2mat(keys(deltaHM));
+    deltas = cell2mat(deltaHM.keySet.toArray.cell);
     freqTotal = 0;
-    allDeltaFreqs = zeros(size(deltas));
+    allDeltaFreqs = zeros(size(deltas,1),1);
     maxDeltaIdx = 0;
-    for i = 1:size(deltas,2)
-        deltaFreq = deltaHM(deltas(i));
-        allDeltaFreqs(1,i) = deltaFreq;
+    for i = 1:size(deltas,1)
+        deltaFreq = deltaHM.get(deltas(i));
+        allDeltaFreqs(i,1) = deltaFreq;
         freqTotal = freqTotal+deltaFreq;
         if(deltaFreq>maxDeltaFreq)
             maxDeltaIdx = i;
@@ -79,9 +79,7 @@ function [coefficient,offset] = match(A,B)
     if(max(allDeltaFreqs)<10*TARGET_ZONE_SIZE)
         confidence = 0;
     else
-        %allDeltaFreqs(maxDeltaIdx) = [];
         confidence = 1-median(double(allDeltaFreqs))/double(maxDeltaFreq);
-        %confidence = double(maxDeltaFreq)/double(freqTotal);
     end
     
     coefficient = confidence;

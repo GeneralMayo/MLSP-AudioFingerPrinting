@@ -1,1 +1,11 @@
 */data/*
+
+reconstruction/constructTimelines.m
+
+*.wav
+
+reconstruction/generateData.m
+
+reconstruction/HASHMAP_TEST.m
+
+reconstruction/TEST_ADDRESSES.m

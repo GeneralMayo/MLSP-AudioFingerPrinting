@@ -4,7 +4,7 @@ function [coefficient,offset] = match(A,B)
 %output: coefficient - strength of match, from [0,1]
 %        offset - offset added to B to line up with matched portion of A
 %           i.e A(t) ~ B(t + offset)
-    global TARGET_ZONE_SIZE;
+    global PSR_THRESHOLD;
     
     %cell to mat conversion
     A = A{1};
@@ -75,14 +75,16 @@ function [coefficient,offset] = match(A,B)
         end
     end
     
-    %threshold
-    if(max(allDeltaFreqs)<10*TARGET_ZONE_SIZE)
+    % Threshold the values
+    PSR = (max(allDeltaFreqs) - mean(allDeltaFreqs))/(std(allDeltaFreqs));
+    if PSR < PSR_THRESHOLD
         confidence = 0;
     else
-        confidence = 1-median(double(allDeltaFreqs))/double(maxDeltaFreq);
+        confidence = PSR;
     end
     
     coefficient = confidence;
     offset = maxDelta;
+%     keyboard;
 end
 

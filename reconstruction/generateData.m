@@ -14,6 +14,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [sample_data, data_components] = generateData(sound_file_data)
     global NUM_SPLITS;
+    global WINDOW;
 
     sample_data = cell(1, NUM_SPLITS*size(sound_file_data,2));
     data_components = cell(1,size(sound_file_data,2));
@@ -26,25 +27,22 @@ function [sample_data, data_components] = generateData(sound_file_data)
         sound_len = size(m,1);
         last_len = 0;
         last_end = 0;
+        
+        segment_size = sound_len/NUM_SPLITS;
+        
         for i=1:NUM_SPLITS
             sample_idx = (k-1)*NUM_SPLITS + i;
-            if i==0
+            if i==1
                 % Initialize the list in the components cell array
                 data_components{k} = [];
             end
 
             % Add the components to the component list
             data_components{k} = [data_components{k}; sample_idx];
-
-            % TODO: improve how segments are chosen
+            
             % Select a starting point that overlaps with the last chosen segment
-            start_pos = int64(last_end - last_len*rand() + 1);
-
-            if i == NUM_SPLITS
-                end_pos = sound_len;
-            else
-                end_pos = int64(start_pos + (sound_len - start_pos)*rand());
-            end
+            start_pos = int64(segment_size*(i-1) + 1 - max(0,segment_size*(i-1) - segment_size/2));
+            end_pos = int64(min(sound_len, segment_size*i + segment_size/4));
             last_end = end_pos;
 
             % TODO: Add noise to the segment
@@ -52,6 +50,7 @@ function [sample_data, data_components] = generateData(sound_file_data)
             sample_data{sample_idx}{1} = m(start_pos:end_pos); %+rand(size(m(start_pos:end_pos)))/10;
             sample_data{sample_idx}{2} = fs;
             fs_list = [fs_list; fs];
+            last_len = size(m(start_pos:end_pos),1);
        end
     end
     

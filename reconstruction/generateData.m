@@ -43,9 +43,11 @@ function [sample_data, data_components, selected_fs] = generateData(sound_file_d
             data_components{k} = [data_components{k}; sample_idx];
             
             % Select a starting point that overlaps with the last chosen segment
-            start_pos = int64(segment_size*(i-1) + 1 - max(0,segment_size*(i-1) - segment_size/2));
-            end_pos = int64(min(sound_len, segment_size*i + segment_size/4));
+            start_pos = int64(max(1,segment_size*(i-1) - segment_size/2));
+            end_pos = int64(min(sound_len, segment_size*i + segment_size/3));
             last_end = end_pos;
+            disp(start_pos)
+            disp(end_pos)
 
             % TODO: Add noise to the segment
             sample_data{sample_idx} = cell(2,1);

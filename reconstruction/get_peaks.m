@@ -43,6 +43,5 @@ function [peak_values] = get_peaks(input_spect)
         if size(peak_values,1) ~= 0
             peak_values = sortrows(peak_values,[1,2]);
         end
-       
     end
 end

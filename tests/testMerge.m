@@ -11,5 +11,5 @@ matchMatrix{1,2} = {.7 2};
 matchMatrix{1,3} = {.6 -3};
 matchMatrix{2,3} = {.2 2};
 
-[timelines, composition] = merge(matchMatrix,recordings);
+[timelines, composition] = merge(matchMatrix,recordings,-1);
 assert(isequal(timelines{1},[31 ; 32 ; 33 ; 11 ; 12 ; 13 ; 14 ; 23 ; 24]));

@@ -17,6 +17,7 @@ function [sample_data, data_components] = generateData(sound_file_data)
 
     sample_data = cell(1, NUM_SPLITS*size(sound_file_data,2));
     data_components = cell(1,size(sound_file_data,2));
+    fs_list = []; % Keep track of the sampling rates
     
     for k=1:size(sound_file_data,2)
         sample = sound_file_data(k);
@@ -47,9 +48,21 @@ function [sample_data, data_components] = generateData(sound_file_data)
 
             % TODO: Add noise to the segment
             sample_data{sample_idx} = cell(2,1);
-            sample_data{sample_idx}{1} = m(start_pos:end_pos)+rand(size(m(start_pos:end_pos)))/10;
+            sample_data{sample_idx}{1} = m(start_pos:end_pos); %+rand(size(m(start_pos:end_pos)))/10;
             sample_data{sample_idx}{2} = fs;
+            fs_list = [fs_list; fs];
        end
+    end
+    
+    % Find the mode of the audio sampling rates
+    selected_fs = mode(fs_list);
+    
+    % Resample the audio data to the selected sampling rate
+    for i=1:size(sample_data,2)
+        if sample_data{i}{2} ~= selected_fs
+            sample_data{i}{1} = resample(sample_data{i}{1}, selected_fs, sample_data{i}{2});
+            sample_data{i}{2} = selected_fs;
+        end
     end
 end
 

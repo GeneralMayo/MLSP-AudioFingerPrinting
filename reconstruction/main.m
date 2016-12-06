@@ -16,7 +16,7 @@ rng(SEED);
 
 %load sound data
 disp('Loading sound data...')
-[soundFileNames,soundFileData] = parseFiles();
+[soundFileNames,soundFileData] = parseAudioFiles();
 
 %generate sample data
 disp('Generating sample data...')
@@ -25,12 +25,12 @@ disp('Generating sample data...')
 %reconstruct a set of timelines from sample recordings
 
 disp('Reconstructing timelines...')
-[timelines, timeline_components] = constructTimelines(recordings);
+[timelines, timeline_components] = constructAudioTimelines(recordings);
 
 %compute errors and output
 disp('Computing error...')
 error = computeError(recording_components,timeline_components);
-
+toc;
 fprintf('Number of original files: %d\n',size(recording_components,2));
 fprintf('Number of reconstructed timelines: %d\n',size(timeline_components,2));
 fprintf('Reconstruction Percent Correct Components: %f\n',error);

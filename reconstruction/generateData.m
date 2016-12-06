@@ -38,13 +38,14 @@ function [sample_data, data_components] = generateData(sound_file_data)
 
             % TODO: improve how segments are chosen
             % Select a starting point that overlaps with the last chosen segment
-            start_pos = int64(last_end - (last_len/2)*rand() + 1);
+            start_pos = int64(last_end - last_len*rand() + 1);
 
             if i == NUM_SPLITS
                 end_pos = sound_len;
             else
                 end_pos = int64(start_pos + (sound_len - start_pos)*rand());
             end
+            last_end = end_pos;
 
             % TODO: Add noise to the segment
             sample_data{sample_idx} = cell(2,1);

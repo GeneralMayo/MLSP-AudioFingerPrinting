@@ -22,7 +22,7 @@ for i=1:size(matches,1)
 end
 
 %sort matches based on coefficient strength
-matchTuples = sortrows(matchTuples,-3);
+matchTuples = sortrows(matchTuples,[-3;]);
 
 %run merging algorithm
 
@@ -50,12 +50,13 @@ for i=1:size(matchTuples,1)
         %assert(0);
     elseif (isKey(timelineOffsets,matchA) && isKey(timelineOffsets,matchB))
         %merge two timelines together
-        timelines = addTimelineToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,numTimelines);
-        numTimelines = numTimelines - 1;
+        [timelines,numTimelines] = addTimelineToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,numTimelines);
     else
         %create a new timeline
         numTimelines = numTimelines + 1;
-        timelines(numTimelines) = recordings(matchA); %TODO arbitrary choice
+        A = recordings(matchA);
+        A = A{1};
+        timelines{numTimelines} = A{1}; %TODO arbitrary choice
         timelineOffsets(matchA) = {numTimelines,1};
         timelineCompositions(numTimelines) = [matchA];
         timelines = addRecordingToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,recordings);
@@ -80,9 +81,18 @@ end
         
         if (~found)
             numTimelines = numTimelines + 1;
-            timelines{numTimelines} = recordings{i};
+            A = recordings{i};
+            A = A{1};
+            timelines{numTimelines} = A{1};
         end
-    end  
+    end
+    
+    %change timelines to be cell array of only length numTimelines
+    newTimelines = cell(1,numTimelines);
+    for i=1:numTimelines
+       newTimelines{i} = timelines{i}; 
+    end
+    timelines = newTimelines;
 end
 
 function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,recordings)
@@ -94,6 +104,7 @@ function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,time
     t = timelines{t_index};
     A_index = B_offset + offset;
     A_recording = recordings{A};
+    A_recording = A_recording{1};
     if (A_index < 0)
         %prepend A to t, then append any leftovers if length(A) > length(t)
         A_index = abs(A_index) + 1;
@@ -118,7 +129,7 @@ function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,time
     
     newTimelines = timelines;
 end
-function [newTimelines] = addTimelineToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,numTimelines)
+function [newTimelines,newNumTimelines] = addTimelineToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,numTimelines)
 %add A's timeline to B's timeline with offset of A relative to B
 val = timelineOffsets(A);
 A_timeline_index = val{1};
@@ -132,7 +143,8 @@ B_t = timelines{B_timeline_index};
 
 %if timelines were already merged, return immediately
 if (A_timeline_index == B_timeline_index)
-    newTimeline = timelines;
+    newTimelines = timelines;
+    newNumTimelines = numTimelines;
     return
 end
     
@@ -151,6 +163,7 @@ end
 %reorder the timeline indices so that A's timeline elements now refer to
 %B's timeline
 newTimelines = reorderTimeline(A_timeline_index,B_timeline_index,timelineCompositions,timelineOffsets,timelines,numTimelines);
+newNumTimelines = numTimelines - 1;
 end
 
 function [newTimelines] = reorderTimeline(oldTimelineIndex,newTimelineIndex,timelineCompositions,timelineOffsets,timelines,numTimelines)

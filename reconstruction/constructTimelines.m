@@ -1,4 +1,4 @@
-function [ timelines,a ] = constructTimelines( recordings )
+function [ timelines,timelineComponents] = constructTimelines( recordings )
 %constructs a set of timelines by stiching recordings together
 %input: 1xN cell of recordings
 %output: 1xM cell of timelines, where M = number of unique timelines
@@ -20,9 +20,7 @@ tic;
 for i=1:size(recordings,2)
    for j=i+1:size(recordings,2)
        matchCell = cell(1,2);
-       display('Start Match');
        [coefficient,offset] = match(addresses(i),addresses(j));
-       display('End Match');
        matchCell{1} = coefficient;
        matchCell{2} = offset;
        matches{i,j} = matchCell;
@@ -31,10 +29,8 @@ end
 toc;
 VIEW_MATCHES
 
-keyboard;
-
 %construct timelines by merging recordings based on match matrix
-timelines = merge(matches,recordings);
+[timelines,timelineComponents] = merge(matches,recordings);
 
 end
 

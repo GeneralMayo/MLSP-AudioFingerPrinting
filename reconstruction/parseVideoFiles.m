@@ -10,7 +10,7 @@
 %                     corresponding to the sound files
 %                
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data] = parseVideoFiles(extension)
+function [audio_recordings, video_recordings] = parseVideoFiles(extension)
     global DATA_DIR
     files = dir([DATA_DIR '*' extension]);
     num_files = size(files,1);

@@ -11,7 +11,7 @@
 %     timelines: 1xN array of final reconstructed videos
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [timelines] = reconstruct_video(video_data_dir, video_file_extension, expected_timelines)
+function [timelines] = video_main(video_data_dir, video_file_extension, expected_timelines)
     if video_data_dir(length(video_data_dir)) ~= '/'
         video_data_dir = [video_data_dir '/'];
     end

@@ -1,4 +1,4 @@
-function [ timelines,a ] = constructTimelines( recordings )
+function [ timelines,a ] = constructAudioTimelines( recordings )
 %constructs a set of timelines by stiching recordings together
 %input: 1xN cell of recordings
 %output: 1xM cell of timelines, where M = number of unique timelines

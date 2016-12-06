@@ -1,18 +1,17 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parseFiles: Get the sound recordings for each sound file in the target directory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% parseAudioFiles: Get the sound recordings for each sound file in the
+%                  target directory.
 % 
 % INPUT:
 %     none
 % 
 % OUTPUT:
-%     names: Cell array of file names for the sound files - relative to the 
-%            global DATA_DIR
 %     data: Cell array of 2x1 cell arrays: 
 %             {1} = data for the sound file
 %             {2} = fs for the sound
 %                 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [names,data] = parseFiles()
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [names,data] = parseAudioFiles()
     global DATA_DIR
     files = dir([DATA_DIR '*.wav']);
     names = cell(1,size(files,1));

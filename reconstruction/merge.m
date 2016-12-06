@@ -28,6 +28,11 @@ matchTuples = sortrows(matchTuples,-3);
 
 %set up initial data structures
 timelines = cell(1,size(recordings,2));
+
+%initialize timelines to empty matrices
+for i=1:length(timelines)
+    timelines{i} = [];
+end
 numTimelines = 0;
 timelineOffsets = containers.Map('KeyType','int32','ValueType','any');
 timelineCompositions = containers.Map('KeyType','int32','ValueType','any');
@@ -45,7 +50,7 @@ for i=1:size(matchTuples,1)
         %assert(0);
     elseif (isKey(timelineOffsets,matchA) && isKey(timelineOffsets,matchB))
         %merge two timelines together
-        timelines = addTimelineToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,recordings);
+        timelines = addTimelineToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,numTimelines);
         numTimelines = numTimelines - 1;
     else
         %create a new timeline
@@ -77,7 +82,7 @@ end
             numTimelines = numTimelines + 1;
             timelines{numTimelines} = recordings{i};
         end
-    end   
+    end  
 end
 
 function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,recordings)
@@ -113,7 +118,7 @@ function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,time
     
     newTimelines = timelines;
 end
-function [newTimelines] = addTimelineToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,recordings)
+function [newTimelines] = addTimelineToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,numTimelines)
 %add A's timeline to B's timeline with offset of A relative to B
 val = timelineOffsets(A);
 A_timeline_index = val{1};
@@ -132,24 +137,54 @@ if (A_timeline_index == B_timeline_index)
 end
     
 %trunctate the timeline being merged and add it to the other
-A_t_index_in_B = B_offset + offset;
-if (A_t_index_in_B < 0)
-    A_t_index_in_B = abs(A_t_index_in_B) + 1;
-    B_t = [A_t(1:A_t_index_in_B) ; B_t];
-    B_t = [B_t ; A_t(length(B_t)+1:length(A_t))];
-    
-    %shift B't timeline to the right
-    shiftTimeline(A_t_index_in_B,B_timeline_index,timelineCompositions,timelineOffsets);
+newOffset = B_offset + offset - A_offset;
+B_t = [ B_t ; A_t(length(B_t) - newOffset + 1 : length(A_t))];
+B_t = [ A_t(1:-newOffset) ; B_t];
+timelines{B} = B_t;
+if (offset < 0)
+   shiftTimeline(-newOffset,B_timeline_index,timelineCompositions,timelineOffsets);
 else
-    trunctateAmount = length(B_t) - A_t_index_in_B + 1;
-    B_t = [B_t ; A_t(trunctateAmount:length(A_t))];
-    
-    %shift A's timeline to the right
-    shiftTimeline(A_t_index_in_B,A_timeline_index,timelineCompositions,timelineOffsets)
+   %shift A's timeline down appropriately
+   shiftTimeline(newOffset,A_timeline_index,timelineCompositions,timelineOffsets);
 end
 
-%reorder the timeline indices appropriately
+%reorder the timeline indices so that A's timeline elements now refer to
+%B's timeline
+newTimelines = reorderTimeline(A_timeline_index,B_timeline_index,timelineCompositions,timelineOffsets,timelines,numTimelines);
+end
 
+function [newTimelines] = reorderTimeline(oldTimelineIndex,newTimelineIndex,timelineCompositions,timelineOffsets,timelines,numTimelines)
+    oldTimelineComposition = timelineCompositions(oldTimelineIndex);
+    newTimelineComposition = timelineCompositions(newTimelineIndex);
+    for i=1:length(oldTimelineComposition)
+        elem = oldTimelineComposition(i);
+        val = timelineOffsets(elem);
+        val{1} = newTimelineIndex;
+        timelineOffsets(elem) = val;
+        newTimelineComposition = [newTimelineComposition ; elem];
+    end
+    timelineCompositions(newTimelineIndex) = newTimelineComposition;
+    
+    %delete old timeline
+    remove(timelineCompositions,oldTimelineIndex);
+    
+    %reorder timeline so that elements are contiguous by left shifiting
+    newTimelines = timelines;
+    for i=oldTimelineIndex+1:length(newTimelines)
+        if (~isempty(newTimelines{i}))
+            toMoveComposition = timelineCompositions(i);
+            for j=1:length(toMoveComposition)
+                elem = toMoveComposition(j);
+                val = timelineOffsets(elem);
+                val{1} = i-1;
+                timelineOffsets(elem) = val;            
+            end
+            timelineCompositions(i-1) = toMoveComposition;
+            remove(timelineCompositions,i);
+            newTimelines{i-1} = newTimelines{i};
+            newTimelines{i} = [];
+        end
+    end   
 end
 
 function [] = shiftTimeline(shift,t_index,timelineCompositions,timelineOffsets)

@@ -1,10 +1,13 @@
-function [timelines, timelineCompositionCell] = merge(matches,recordings)
+function [timelines, timelineCompositionCell] = merge(matches,recordings,audioRate)
 %merges recordings together based on matchings with other recordings
 %input: matches - NxN upper right triangular cell matrix of matches
-%       recordings - 1xM cell array of audio recordings
+%       recordings - 1xM cell array of recordings, where each entry
+%       is a 2x1 cell consiting of (1) data and (2) samplingRate
+%       audioRate - the sampling rate to scale the match offsets by, or -1
+%       to compute indices exactly
+%       rescale offsets and treats recordings as video
 %output: 1xN cell array of merged audio files, where N = number of unique
 %        samples as found by our algorithm
-
 
 global MATCH_THRESHOLD;
 
@@ -15,7 +18,11 @@ for i=1:size(matches,1)
        match = matches{i,j};
        coef = match{1};
        offset = match{2};
+       %scale the offset if we're using video files
        if (coef >= MATCH_THRESHOLD)
+            if audioRate > 0
+                offset = offset / audioRate;
+            end
             matchTuples = [matchTuples ; i,j,coef,offset];
        end
    end
@@ -43,23 +50,22 @@ for i=1:size(matchTuples,1)
     offset = match(4);   
     if (isKey(timelineOffsets,matchA) && ~isKey(timelineOffsets,matchB))
         %merge B into A's timeline
-        timelines = addRecordingToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,recordings);
+        timelines = addRecordingToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,recordings,audioRate);
     elseif (~isKey(timelineOffsets,matchA) && isKey(timelineOffsets,matchB))
         %merge A into B's timeline
-        timelines = addRecordingToTimeline(matchA,matchB,-1*offset,timelineOffsets,timelineCompositions,timelines,recordings);
-        %assert(0);
+        timelines = addRecordingToTimeline(matchA,matchB,-1*offset,timelineOffsets,timelineCompositions,timelines,recordings,audioRate);
     elseif (isKey(timelineOffsets,matchA) && isKey(timelineOffsets,matchB))
         %merge two timelines together
-        [timelines,numTimelines] = addTimelineToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,numTimelines);
+        [timelines,numTimelines] = addTimelineToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,numTimelines,audioRate);
     else
         %create a new timeline
         numTimelines = numTimelines + 1;
-        A = recordings(matchA);
+        A = recordings{matchA};
         A = A{1};
-        timelines{numTimelines} = A{1}; %TODO arbitrary choice
+        timelines{numTimelines} = A; %TODO arbitrary choice
         timelineOffsets(matchA) = {numTimelines,1};
         timelineCompositions(numTimelines) = [matchA];
-        timelines = addRecordingToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,recordings);
+        timelines = addRecordingToTimeline(matchB,matchA,offset,timelineOffsets,timelineCompositions,timelines,recordings,audioRate);
     end
 end
 
@@ -83,7 +89,7 @@ end
             numTimelines = numTimelines + 1;
             A = recordings{i};
             A = A{1};
-            timelines{numTimelines} = A{1};
+            timelines{numTimelines} = A;
         end
     end
     
@@ -95,28 +101,63 @@ end
     timelines = newTimelines;
 end
 
-function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,recordings)
+function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,recordings,audioRate)
     %add recording A to recording B's timeline
     %offset is offset of A relative to B ie A(t + offset) = B(t)
     value = timelineOffsets(B);
     t_index = value{1};  
     B_offset = value{2};
+    if (audioRate > 0)
+        B_fps = recordings{B};
+        B_fps = B_fps{2};
+        B_offset = B_offset / B_fps;
+    end
     t = timelines{t_index};
     A_index = B_offset + offset;
     A_recording = recordings{A};
     A_recording = A_recording{1};
+    
     if (A_index < 0)
         %prepend A to t, then append any leftovers if length(A) > length(t)
-        A_index = abs(A_index) + 1;
-        t = [A_recording(1:A_index) ; t];
-        t = [t ; A_recording(length(t)+1:length(A_recording))];
-        new_AIndex = 1;
-        shift = A_index;
+        if (audioRate < 0)
+            A_index = abs(A_index) + 1;
+            t = [A_recording(1:A_index) ; t];
+            t = [t ; A_recording(length(t)+1:length(A_recording))];
+            new_AIndex = 1;
+            shift = A_index;
+        else
+            A_obj = recordings{A};
+            A_obj = A_obj{1};
+            A_obj.CurrentTime = 0;
+            A_index = abs(A_index);
+            count = 0;
+            while (A_obj.CurrentTime < A_index)
+                frame = readFrame(A_obj);
+                t = [frame ; t];
+                count = count + 1;
+            end
+            new_AIndex = 1;
+            shift = count;
+        end
     else
         %append A to t, or do nothing if length(A) + offset <= length(t)
-        t = [t ; A_recording(length(A_index:length(t))+1:length(A_recording))];
-        new_AIndex = A_index;
-        shift = 0;
+        if (audioRate < 0)
+            t = [t ; A_recording(length(A_index:length(t))+1:length(A_recording))];
+            new_AIndex = A_index;
+            shift = 0;
+        else
+            A_obj = recordings{A};
+            A_fps = A_obj{2};
+            A_obj = A_obj{1};
+            A_time = length(A_index * A_fps:length(t)) / A_fps;
+            A_obj.CurrentTime = A_time;
+            while (hasFrame(A_obj))
+                frame = readFrame(A_obj);
+                t = [t ; frame];
+            end
+            new_AIndex = A_index * A_fps;
+            shift = 0;
+        end
     end
     
     %update timeline and maps
@@ -129,8 +170,14 @@ function [newTimelines] = addRecordingToTimeline(A,B,offset,timelineOffsets,time
     
     newTimelines = timelines;
 end
-function [newTimelines,newNumTimelines] = addTimelineToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,numTimelines)
+function [newTimelines,newNumTimelines] = addTimelineToTimeline(A,B,offset,timelineOffsets,timelineCompositions,timelines,numTimelines,audioRate)
 %add A's timeline to B's timeline with offset of A relative to B
+
+%turn offset back into index offset
+if (audioRate > 0)
+    offset = offset * audioRate;
+end
+
 val = timelineOffsets(A);
 A_timeline_index = val{1};
 A_offset = val{2};
@@ -162,11 +209,11 @@ end
 
 %reorder the timeline indices so that A's timeline elements now refer to
 %B's timeline
-newTimelines = reorderTimeline(A_timeline_index,B_timeline_index,timelineCompositions,timelineOffsets,timelines,numTimelines);
+newTimelines = reorderTimeline(A_timeline_index,B_timeline_index,timelineCompositions,timelineOffsets,timelines);
 newNumTimelines = numTimelines - 1;
 end
 
-function [newTimelines] = reorderTimeline(oldTimelineIndex,newTimelineIndex,timelineCompositions,timelineOffsets,timelines,numTimelines)
+function [newTimelines] = reorderTimeline(oldTimelineIndex,newTimelineIndex,timelineCompositions,timelineOffsets,timelines)
     oldTimelineComposition = timelineCompositions(oldTimelineIndex);
     newTimelineComposition = timelineCompositions(newTimelineIndex);
     for i=1:length(oldTimelineComposition)

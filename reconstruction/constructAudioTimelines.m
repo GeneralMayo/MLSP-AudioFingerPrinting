@@ -30,7 +30,7 @@ toc;
 VIEW_MATCHES
 
 %construct timelines by merging recordings based on match matrix
-[timelines,timelineComponents] = merge(matches,recordings);
+[timelines,timelineComponents] = merge(matches,recordings,-1);
 
 end
 

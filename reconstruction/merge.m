@@ -9,7 +9,8 @@ function [timelines, timelineCompositionCell] = merge(matches,recordings,audioRa
 %output: 1xN cell array of merged audio files, where N = number of unique
 %        samples as found by our algorithm
 
-global MATCH_THRESHOLD;
+global PSR_THRESHOLD;
+MATCH_THRESHOLD = PSR_THRESHOLD;
 
 %parse the matrix into match pairs 
 matchTuples = [];
@@ -20,8 +21,10 @@ for i=1:size(matches,1)
        offset = match{2};
        %scale the offset if we're using video files
        if (coef >= MATCH_THRESHOLD)
-            if audioRate > 0
-                offset = offset / audioRate;
+            if audioRate < 0
+                audioSampling = recording{j};
+                audioSampling = audioSampling{2};
+                offset = offset / audioSampling;
             end
             matchTuples = [matchTuples ; i,j,coef,offset];
        end

@@ -85,11 +85,5 @@ function [coefficient,offset] = match(A,B)
     
     coefficient = confidence;
     offset = maxDelta;
-    
-    keyboard;
-    sampleRatio = 902.1277;
-    fs = 44100;
-    fspectrogram = fs/sampleRatio;
-    offset = offset/fspectrogram;
 end
 

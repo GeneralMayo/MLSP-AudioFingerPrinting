@@ -1,4 +1,4 @@
-function [ addresses ] = generateAddresses(audio, id)
+function [ addresses, fspectrogram ] = generateAddresses(audio, id)
 % given an audio file, generates the set of addresses for that file
 %input: 2x1 Audio cell, where Row 1 is the data, Row 2 is sfs
 %output: Nx1 matrix of addresses, where each addresses is a 32 bit int
@@ -9,6 +9,10 @@ global TARGET_ZONE_SIZE ANCHOR_POSITION WINDOW NOVERLAP NFFT;
 m = audio{1};
 fs = audio{2};
 [S,~,~] = spectrogram(m, WINDOW, NOVERLAP, NFFT, fs);
+
+sampleRatio = size(m,1)/size(S,2);
+fspectrogram = fs/sampleRatio;
+
 
 %get high energy peaks
 peaks = get_peaks(S);

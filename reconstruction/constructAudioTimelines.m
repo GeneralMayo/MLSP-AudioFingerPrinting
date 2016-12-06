@@ -12,17 +12,17 @@ addresses = cell(1,size(recordings,2));
 
 %generate addresses for each input recording
 for i=1:size(addresses,2)
-   addresses{i} = generateAddresses(recordings{i},i);
+   [addresses{i},fspec] = generateAddresses(recordings{i},i);
 end
 
 %generate matching matrix
 tic;
 for i=1:size(recordings,2)
-   for j=i+1:size(recordings,2)
+   for j=i+1:size(recordings,2)     
        matchCell = cell(1,2);
        [coefficient,offset] = match(addresses(i),addresses(j));
        matchCell{1} = coefficient;
-       matchCell{2} = offset;
+       matchCell{2} = offset/fspec;
        matches{i,j} = matchCell;
    end
 end

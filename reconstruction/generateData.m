@@ -10,9 +10,11 @@
 %   sample_data: 1xM cell of sliced sounds data. M = N*NUM_SPLITS
 %   data_components: 1xN cell array representing the source of
 %                     sample_data files.
+%   selected_fs: the sampling rate that is applied to all of the sound
+%                files
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [sample_data, data_components] = generateData(sound_file_data)
+function [sample_data, data_components, selected_fs] = generateData(sound_file_data)
     global NUM_SPLITS;
     global WINDOW;
 

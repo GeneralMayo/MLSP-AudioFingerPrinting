@@ -9,7 +9,7 @@ NFFT = 1028;
 NUM_SPLITS = 3;
 DATA_DIR = 'data/';
 MATCH_THRESHOLD = .90;
-PSR_THRESHOLD = 10;
+PSR_THRESHOLD = 7;
 
 %seed the rng
 SEED = 42;
@@ -21,7 +21,7 @@ disp('Loading sound data...')
 
 %generate sample data
 disp('Generating sample data...')
-[recordings, recording_components] = generateData(soundFileData);
+[recordings, recording_components, selected_fs] = generateData(soundFileData);
 
 %reconstruct a set of timelines from sample recordings
 

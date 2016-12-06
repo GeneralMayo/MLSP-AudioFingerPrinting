@@ -16,9 +16,9 @@ function [ error ] = computeError(recording_components,timeline_components)
     
     % Check that the correct components make up each grouping
     components_found = zeros(size(recording_components,2),1);
-    for i=1:size(timeline_components,1)
-        for j=1:size(recording_components,1)
-            if sort(recording_components{j}) == sort(timeline_components{j})
+    for i=1:size(timeline_components,2)
+        for j=1:size(recording_components,2)
+            if isequal(sort(recording_components{j}), sort(timeline_components{i}))
                 if components_found(j) == 1
                     disp('Found duplicate for timeline')
                 end

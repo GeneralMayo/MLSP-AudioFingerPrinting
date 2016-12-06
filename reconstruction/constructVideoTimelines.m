@@ -10,7 +10,6 @@
 %                       audio recordings based on index.
 %                       Each item in the cell array is a 2x1 cell where
 %                       Item 1 = video data, Item 2 = frame rate
-
 %
 % OUTPUT:
 %     timelines: 1xN array of final reconstructed videos

@@ -28,7 +28,7 @@ for i=1:size(recordings,2)
 end
 toc;
 VIEW_MATCHES
-
+keyboard;
 %construct timelines by merging recordings based on match matrix
 [timelines,timelineComponents] = merge(matches,recordings,-1);
 

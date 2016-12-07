@@ -22,7 +22,7 @@ for i=1:size(matches,1)
        %scale the offset if we're using video files
        if (coef >= MATCH_THRESHOLD)
             if audioRate < 0
-                audioSampling = recording{j};
+                audioSampling = recordings{j};
                 audioSampling = audioSampling{2};
                 offset = offset / audioSampling;
             end

@@ -16,7 +16,7 @@ function [timelines] = video_main(video_data_dir, video_file_extension, expected
         video_data_dir = [video_data_dir '/'];
     end
     %initialize global variables
-    global TARGET_ZONE_SIZE ANCHOR_POSITION WINDOW NOVERLAP NFFT NUM_SPLITS DATA_DIR;
+    global TARGET_ZONE_SIZE ANCHOR_POSITION WINDOW NOVERLAP NFFT NUM_SPLITS DATA_DIR PSR_THRESHOLD;
     TARGET_ZONE_SIZE = 5;
     ANCHOR_POSITION = 3;
     WINDOW = 1028;
@@ -24,6 +24,7 @@ function [timelines] = video_main(video_data_dir, video_file_extension, expected
     NFFT = 1028;
     NUM_SPLITS = 3;
     DATA_DIR = video_data_dir;
+    PSR_THRESHOLD = 3.5;
 
     % Load video data
     disp('Loading data...')
@@ -31,7 +32,7 @@ function [timelines] = video_main(video_data_dir, video_file_extension, expected
 
     % Reconstruct a set of timelines from sample recordings
     disp('Reconstructing timelines...')
-    [timelines] = constructVideoTimelines(audio_recordings, video_recordings);
+    [timelines] = constructAudioTimelines(audio_recordings);
 
     if size(timelines,2) ~= expected_timelines
         disp(['Tried to reconstruct the events of ' num2str(expected_timelines)])

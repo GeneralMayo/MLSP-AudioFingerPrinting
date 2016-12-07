@@ -38,9 +38,11 @@ end
 toc;
 VIEW_MATCHES
 
+keyboard;
+
 %get the audio sample rate
-A = audio_recordings{1};
-A = A{1};
-[timelines,timelineComponents] = merge(matches,video_recordings,A(2));
+% A = audio_recordings{1};
+% A = A{1};
+% [timelines,timelineComponents] = merge(matches,video_recordings,A(2));
 end
 
